@@ -4,7 +4,7 @@ requires = ["scikit-build-core >=0.10", "nanobind >=1.3.2", "setuptools-scm>=8"]
 
 [project]
 authors = [
-  {name = "Alex Kaszynski", email = "akascap@gmail.com"}
+  { name = "Alex Kaszynski", email = "akascap@gmail.com" }
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -36,18 +36,18 @@ skip = "*musllinux* cp314t-*"  # disable musl-based wheels and free threading
 test-command = "pytest {project}/tests"
 test-requires = "pytest pyvista"
 
-# VTK does not publish Windows ARM64 wheels. Keep the NumPy simplify,
-# replay and binding tests; the existing VTK-dependent tests report skips.
-[[tool.cibuildwheel.overrides]]
-select = "*-win_arm64"
-test-requires = "pytest numpy"
-test-command = "pytest -ra {project}/tests"
-
 [tool.cibuildwheel.macos]
 archs = ["native"]
 
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.14"  # Needed for full C++17 support on MacOS
+
+# VTK does not publish Windows ARM64 wheels. Keep the NumPy simplify,
+# replay and binding tests; the existing VTK-dependent tests report skips.
+[[tool.cibuildwheel.overrides]]
+select = "*-win_arm64"
+test-command = "pytest -ra {project}/tests"
+test-requires = "pytest numpy"
 
 [tool.codespell]
 ignore-words-list = 'THIRDPARTY'
@@ -81,8 +81,8 @@ select = ["E4", "E7", "E9", "F"]
 
 [tool.scikit-build]
 build-dir = "build/{wheel_tag}"
-minimum-version = "0.10"
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+minimum-version = "0.10"
 sdist.exclude = [".github", "*.png", "tests", ".mypy_cache", ".pre-commit-config.yaml", "*_cache", "CONTRIBUTING.md", ".gitignore"]
 wheel.exclude = ["**.cpp", "**.h"]
 
