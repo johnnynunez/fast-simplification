@@ -36,6 +36,13 @@ skip = "*musllinux* cp314t-*"  # disable musl-based wheels and free threading
 test-command = "pytest {project}/tests"
 test-requires = "pytest pyvista"
 
+# VTK does not publish Windows ARM64 wheels. Keep the NumPy simplify,
+# replay and binding tests; the existing VTK-dependent tests report skips.
+[[tool.cibuildwheel.overrides]]
+select = "*-win_arm64"
+test-requires = "pytest numpy"
+test-command = "pytest -ra {project}/tests"
+
 [tool.cibuildwheel.macos]
 archs = ["native"]
 
