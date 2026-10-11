@@ -1,0 +1,51 @@
+name: Fork ARM64 validation - fast-simplification
+'on':
+  push:
+    branches:
+    - hermes-ci/windows-arm64-d1938a7e8c36
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: fork-arm64-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - windows-11-arm
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+        ref: d1938a7e8c36c141fecc665741bab89814759c96
+    - name: Verify exact public PR source revision
+      shell: pwsh
+      run: '$actual = git rev-parse HEAD
+
+        if ($actual -ne ''d1938a7e8c36c141fecc665741bab89814759c96'') { throw ''Source revision mismatch'' }
+
+        Write-Output (''TESTED_SOURCE_SHA=''+$actual)'
+    - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      with:
+        python-version: '3.12'
+        architecture: arm64
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v4.2.1
+      env:
+        CIBW_ARCHS_WINDOWS: ${{ matrix.os == 'windows-11-arm' && 'ARM64' || 'auto64' }}
+        CMAKE_BUILD_PARALLEL_LEVEL: '2'
+    - name: List generated wheels
+      run: ls ./wheelhouse/*
+    - uses: actions/upload-artifact@v7
+      with:
+        path: ./wheelhouse/*.whl
+        name: fast-simplification-wheel-${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 60
+    if: github.repository_owner == 'johnnynunez'
